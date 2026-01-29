@@ -9,6 +9,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.turkraft.springfilter.converter.FilterSpecification;
+import com.turkraft.springfilter.converter.FilterSpecificationConverter;
+import com.turkraft.springfilter.parser.FilterParser;
+import com.turkraft.springfilter.parser.node.FilterNode;
+
 import vn.thuong.jobhunter.domain.Job;
 import vn.thuong.jobhunter.domain.Resume;
 import vn.thuong.jobhunter.domain.User;
@@ -19,18 +24,24 @@ import vn.thuong.jobhunter.domain.response.resume.ResUpdateResumeDTO;
 import vn.thuong.jobhunter.repository.JobRepository;
 import vn.thuong.jobhunter.repository.ResumeRepository;
 import vn.thuong.jobhunter.repository.UserRepository;
+import vn.thuong.jobhunter.util.SecurityUtil;
 
 @Service
 public class ResumeService {
     private final ResumeRepository resumeRepository;
     private final UserRepository userRepository;
     private final JobRepository jobRepository;
+    private final FilterParser filterParser;
+    private final FilterSpecificationConverter filterSpecificationConverter;
 
     public ResumeService(ResumeRepository resumeRepository, UserRepository userRepository,
-            JobRepository jobRepository) {
+            JobRepository jobRepository, FilterParser filterParser,
+            FilterSpecificationConverter filterSpecificationConverter) {
         this.resumeRepository = resumeRepository;
         this.jobRepository = jobRepository;
         this.userRepository = userRepository;
+        this.filterParser = filterParser;
+        this.filterSpecificationConverter = filterSpecificationConverter;
     }
 
     public ResCreateResumeDTO handleCreateResume(Resume resume) {
@@ -113,6 +124,32 @@ public class ResumeService {
         List<ResResumeDTO> listResume = pageResume.getContent()
                 .stream().map(item -> this.getResume(item))
                 .collect(Collectors.toList());
+        rs.setResult(listResume);
+
+        return rs;
+    }
+
+    public ResultPaginationDTO fetchResumeByUser(Pageable pageable) {
+        String email = SecurityUtil.getCurrentUserLogin().isPresent() == true
+                ? SecurityUtil.getCurrentUserLogin().get()
+                : "";
+        FilterNode node = filterParser.parse("email" + email + "'");
+        FilterSpecification<Resume> spec = filterSpecificationConverter.convert(node);
+        Page<Resume> pageResume = this.resumeRepository.findAll(spec, pageable);
+
+        ResultPaginationDTO rs = new ResultPaginationDTO();
+        ResultPaginationDTO.Meta mt = new ResultPaginationDTO.Meta();
+
+        mt.setPage(pageable.getPageNumber() + 1);
+        mt.setPageSize(pageable.getPageSize());
+        mt.setPages(pageResume.getTotalPages());
+        mt.setTotal(pageResume.getTotalElements());
+
+        rs.setMeta(mt);
+        List<ResResumeDTO> listResume = pageResume.getContent()
+                .stream().map(item -> this.getResume(item))
+                .collect(Collectors.toList());
+
         rs.setResult(listResume);
 
         return rs;

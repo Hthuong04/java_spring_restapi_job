@@ -54,6 +54,10 @@ public class User {
     @JsonIgnore
     List<Resume> resumes;
 
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
+
     public User() {
     }
 
@@ -173,6 +177,14 @@ public class User {
 
     public void setResumes(List<Resume> resumes) {
         this.resumes = resumes;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     @PrePersist

@@ -55,11 +55,6 @@ public class RoleController {
         if (currentRole == null) {
             throw new IdInvalidException("role không tồn tại");
         }
-        boolean isExistRole = this.roleService.checkExistRoleName(role.getName());
-        if (isExistRole) {
-            throw new IdInvalidException("role đã tồn tại");
-
-        }
 
         Role upRole = this.roleService.handleUpdateRole(role);
         return ResponseEntity.ok().body(upRole);

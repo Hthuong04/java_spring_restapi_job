@@ -59,12 +59,12 @@ public class AuthController {
         User currentUserDB = this.userService.handleGetUserByUsername(loginDTO.getUsername());
         if (currentUserDB != null) {
             ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(currentUserDB.getId(), currentUserDB.getEmail(),
-                    currentUserDB.getName());
+                    currentUserDB.getName(), currentUserDB.getRole());
             res.setUser(userLogin);
 
         }
         // create access token
-        String acccess_token = this.securityUtil.createAccessToken(authentication.getName(), res.getUser());
+        String acccess_token = this.securityUtil.createAccessToken(authentication.getName(), res);
 
         res.setAccessToken(acccess_token);
 
@@ -98,6 +98,7 @@ public class AuthController {
             userLogin.setId(currentUserDB.getId());
             userLogin.setEmail(currentUserDB.getEmail());
             userLogin.setName(currentUserDB.getName());
+            userLogin.setRole(currentUserDB.getRole());
             userGetAccount.setUser(userLogin);
         }
         return ResponseEntity.ok().body(userGetAccount);
@@ -123,11 +124,11 @@ public class AuthController {
         User currentUserDB = this.userService.handleGetUserByUsername(email);
         if (currentUserDB != null) {
             ResLoginDTO.UserLogin userLogin = new ResLoginDTO.UserLogin(currentUserDB.getId(), currentUserDB.getEmail(),
-                    currentUserDB.getName());
+                    currentUserDB.getName(), currentUserDB.getRole());
             res.setUser(userLogin);
 
         }
-        String acccess_token = this.securityUtil.createAccessToken(email, res.getUser());
+        String acccess_token = this.securityUtil.createAccessToken(email, res);
 
         res.setAccessToken(acccess_token);
 
