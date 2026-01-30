@@ -130,10 +130,11 @@ public class ResumeService {
     }
 
     public ResultPaginationDTO fetchResumeByUser(Pageable pageable) {
+        // query builder
         String email = SecurityUtil.getCurrentUserLogin().isPresent() == true
                 ? SecurityUtil.getCurrentUserLogin().get()
                 : "";
-        FilterNode node = filterParser.parse("email" + email + "'");
+        FilterNode node = filterParser.parse("email='" + email + "'");
         FilterSpecification<Resume> spec = filterSpecificationConverter.convert(node);
         Page<Resume> pageResume = this.resumeRepository.findAll(spec, pageable);
 
@@ -142,10 +143,13 @@ public class ResumeService {
 
         mt.setPage(pageable.getPageNumber() + 1);
         mt.setPageSize(pageable.getPageSize());
+
         mt.setPages(pageResume.getTotalPages());
         mt.setTotal(pageResume.getTotalElements());
 
         rs.setMeta(mt);
+
+        // remove sensitive data
         List<ResResumeDTO> listResume = pageResume.getContent()
                 .stream().map(item -> this.getResume(item))
                 .collect(Collectors.toList());

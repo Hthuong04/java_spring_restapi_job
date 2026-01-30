@@ -5,9 +5,12 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import vn.thuong.jobhunter.domain.Role;
+import java.util.List;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long>, JpaSpecificationExecutor<Role> {
     boolean existsByName(String name);
+
+    Role findByName(String name);
 
 }
