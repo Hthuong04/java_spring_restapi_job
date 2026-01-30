@@ -80,4 +80,14 @@ public class RoleController {
 
         return ResponseEntity.ok().body(rs);
     }
+
+    @GetMapping("roles/{id}")
+    @ApiMessage("Fetch role by id")
+    public ResponseEntity<Role> getById(@PathVariable("id") long id) throws IdInvalidException {
+        Role currentRole = this.roleService.fetchRoleById(id);
+        if (currentRole == null) {
+            throw new IdInvalidException("role không tồn tại");
+        }
+        return ResponseEntity.ok().body(currentRole);
+    }
 }
