@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import vn.thuong.jobhunter.controller.SkillController;
 import vn.thuong.jobhunter.domain.Job;
 import vn.thuong.jobhunter.domain.Skill;
+import vn.thuong.jobhunter.domain.Subscriber;
 import vn.thuong.jobhunter.domain.User;
 import vn.thuong.jobhunter.domain.response.ResultPaginationDTO;
 import vn.thuong.jobhunter.repository.SkillRepository;
@@ -67,6 +68,10 @@ public class SkillService {
             Skill currentSkill = skillOptional.get();
             for (Job job : currentSkill.getJobs()) {
                 job.getSkills().remove(currentSkill);
+            }
+
+            for (Subscriber subscriber : currentSkill.getSubscribers()) {
+                subscriber.getSkills().remove(currentSkill);
             }
             this.skillRepository.delete(currentSkill);
         }
